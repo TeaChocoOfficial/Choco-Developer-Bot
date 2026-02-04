@@ -1,6 +1,6 @@
 //-Path: "Choco-Developer-Bot/src/commands/introduction/buttons.ts"
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { questions } from "./config";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 
 /**
  * สร้างปุ่มสำหรับ Embed

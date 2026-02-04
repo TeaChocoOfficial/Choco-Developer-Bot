@@ -1,11 +1,12 @@
 //-Path: "Choco-Developer-Bot/src/index.ts"
 import "dotenv/config";
+import express from "express";
 import { ready } from "./handlers/client";
 import { connectDatabase } from "./handlers/database";
 import { Client, GatewayIntentBits } from "discord.js";
 import { setupMemberJoinHandler } from "./handlers/memberJoin";
 
-const token = process.env.DISCORD_TOKEN;
+const app = express();
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -14,6 +15,8 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
     ],
 });
+const port = process.env.PORT || 3000;
+const token = process.env.DISCORD_TOKEN;
 
 /**
  * เริ่มการทำงานของบอทพร้อมระบบรันใหม่อัตโนมัติเมื่อเกิดข้อผิดพลาด
@@ -37,5 +40,8 @@ process.on("unhandledRejection", (error) =>
 process.on("uncaughtException", (error) =>
     console.error("Uncaught Exception:", error),
 );
+
+app.get("/", (request, response) => response.send("Bot is running!"));
+app.listen(port, () => console.log(`🚀 Express is listening on port ${port}`));
 
 initialize();
