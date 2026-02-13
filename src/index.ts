@@ -3,8 +3,8 @@ import "dotenv/config";
 import express from "express";
 import { ready } from "./handlers/client";
 import { connectDatabase } from "./handlers/database";
-import { Client, GatewayIntentBits } from "discord.js";
 import { setupMemberJoinHandler } from "./handlers/memberJoin";
+import { Client, GatewayIntentBits, Partials } from "discord.js";
 
 const app = express();
 const client = new Client({
@@ -13,7 +13,10 @@ const client = new Client({
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.GuildMessageReactions,
     ],
+    partials: [Partials.Channel, Partials.Message], // สำหรับ DM
 });
 const port = process.env.PORT || 3000;
 const token = process.env.DISCORD_TOKEN;
@@ -41,7 +44,13 @@ process.on("uncaughtException", (error) =>
     console.error("Uncaught Exception:", error),
 );
 
-app.get("/", (request, response) => response.send("Bot is running!"));
+app.get("/", (request, response) =>
+    response.json({
+        status: "online",
+        time: new Date().toISOString(),
+        bot: client.isReady() ? "connected" : "disconnected",
+    }),
+);
 app.listen(port, () => console.log(`🚀 Express is listening on port ${port}`));
 
 initialize();

@@ -1,4 +1,5 @@
 //-Path: "Choco-Developer-Bot/src/handlers/client.ts"
+import { handleMention } from "./mention";
 import { Client, Events } from "discord.js";
 import { adminMessageCreate } from "../commands/admin/admin";
 import { handleIntroduction } from "../commands/introduction";
@@ -14,6 +15,7 @@ export const ready = (client: Client) => {
 
     client.on(Events.MessageCreate, (message) => {
         if (message.author.bot) return;
+        handleMention(message);
         adminMessageCreate(message);
         handleIntroduction(message);
     });
