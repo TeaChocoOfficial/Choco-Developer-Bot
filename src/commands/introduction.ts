@@ -6,6 +6,7 @@ import {
     OmitPartialGroupDMChannel,
 } from "discord.js";
 import Room from "../data/room";
+import Introduction from "../models/Introduction";
 import { createModeButtons } from "./introduction/buttons";
 import { startCustomMode, startStepByStep } from "./introduction/flows";
 
@@ -17,19 +18,36 @@ export async function handleIntroduction(
     message: OmitPartialGroupDMChannel<Message<boolean>>,
 ) {
     if (!message.guild || !message.member) return;
-    if (!Room.INTRODUCTION_CHANNEL_ID.includes(message.channel.id)) return;
+    if (
+        ![Room.INTRODUCTION_CHANNEL.id, Room.BOT_TESTING_CHANNEL.id].includes(
+            message.channel.id,
+        )
+    )
+        return;
     if (!message.content.includes("สวัสดี")) return;
 
     // ลบข้อความ "สวัสดี" ของผู้ใช้
     await message.delete().catch(() => {});
 
+    const existingData = await Introduction.findOne({
+        discordId: message.author.id,
+    });
+    const isEdit = !!existingData;
+
     const modeEmbed = new EmbedBuilder()
-        .setColor(0x3498db)
-        .setTitle("👋 เลือกรูปแบบการแนะนำตัว")
+        .setColor(isEdit ? 0xe67e22 : 0x3498db)
+        .setTitle(
+            isEdit ? "✏️ แก้ไขข้อมูลการแนะนำตัว" : "👋 เลือกรูปแบบการแนะนำตัว",
+        )
         .setDescription(
-            `สวัสดีครับ **${message.author.username}**! คุณต้องการแนะนำตัวแบบไหน?\n\n` +
-                "📑 **ตอบทีละคำถาม:** ระบบจะถามคำถามคุณทีละข้อ\n" +
-                "📝 **ตอบแบบอิสระ:** ตอบทุกคำถามในครั้งเดียวได้อย่างอิสระ",
+            `สวัสดีครับ **${message.author.username}**! ${isEdit ? "คุณต้องการแก้ไขข้อมูลในรูปแบบไหน?" : "คุณต้องการแนะนำตัวแบบไหน?"}\n\n` +
+                "📑 **ตอบทีละคำถาม:** " +
+                (isEdit ? "แก้ไขข้อมูลทีละข้อ" : "ระบบจะถามคำถามคุณทีละข้อ") +
+                "\n" +
+                "📝 **ตอบแบบอิสระ:** " +
+                (isEdit ?
+                    "แก้ไขข้อมูลทั้งหมดในครั้งเดียว"
+                :   "ตอบทุกคำถามในครั้งเดียวได้อย่างอิสระ"),
         );
 
     const modeMessage = await message.channel.send({
@@ -56,13 +74,13 @@ export async function handleIntroduction(
         if (interaction.customId === "step") {
             modeCollector.stop();
             await modeMessage.delete().catch(() => {});
-            await startStepByStep(message);
+            await startStepByStep(message, existingData as any);
         }
 
         if (interaction.customId === "custom") {
             modeCollector.stop();
             await modeMessage.delete().catch(() => {});
-            await startCustomMode(message);
+            await startCustomMode(message, existingData as any);
         }
     });
 

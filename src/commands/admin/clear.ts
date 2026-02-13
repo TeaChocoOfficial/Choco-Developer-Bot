@@ -5,7 +5,7 @@ import { Message } from "discord.js";
 export async function clear(message: Message<boolean>) {
     if (
         ["cls", "clear"].includes(message.content) &&
-        Room.BOT_TESTING_CHANNEL_ID.includes(message.channel.id)
+        Room.BOT_TESTING_CHANNEL.id === message.channel.id
     ) {
         if (
             !message.channel.isTextBased() ||

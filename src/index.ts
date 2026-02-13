@@ -8,6 +8,12 @@ import { Client, GatewayIntentBits, Partials } from "discord.js";
 
 const app = express();
 const client = new Client({
+    partials: [
+        Partials.Channel,
+        Partials.Message,
+        Partials.GuildMember,
+        Partials.User,
+    ], // รองรับข้อมูลที่ไม่ครบ (Partial)
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
@@ -16,7 +22,6 @@ const client = new Client({
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.GuildMessageReactions,
     ],
-    partials: [Partials.Channel, Partials.Message], // สำหรับ DM
 });
 const port = process.env.PORT || 3000;
 const token = process.env.DISCORD_TOKEN;
@@ -31,7 +36,6 @@ const initialize = async () => {
         await connectDatabase();
         console.log("🔃 Clinet login...");
         await client.login(token);
-        console.log("✅ Success: client.login() resolved");
     } catch (error) {
         console.error("❌ Bot Error:", error);
         console.log("🔄 กำลังรีสตาร์ทใน 5 วินาที...");

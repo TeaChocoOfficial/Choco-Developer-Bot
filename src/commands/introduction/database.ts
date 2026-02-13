@@ -1,8 +1,9 @@
 //-Path: "Choco-Developer-Bot/src/commands/introduction/database.ts"
-import { Message, EmbedBuilder, OmitPartialGroupDMChannel } from "discord.js";
-import Introduction, { IIntroduction } from "../../models/Introduction";
-import { createSummaryEmbed } from "./embeds";
+import Room from "../../data/room";
 import Role from "../../data/role";
+import { createSummaryEmbed } from "./embeds";
+import Introduction, { IIntroduction } from "../../models/Introduction";
+import { Message, EmbedBuilder, OmitPartialGroupDMChannel } from "discord.js";
 
 /**
  * บันทึกข้อมูลการแนะนำตัวลงฐานข้อมูล
@@ -42,6 +43,13 @@ export async function saveIntroduction(
             message.guild,
             data,
         );
+
+        const listingChannel = message.guild.channels.cache.get(
+            Room.LIST_OF_LOST_PEOPLE_CHANNEL.id,
+        );
+        if (listingChannel?.isTextBased())
+            await listingChannel.send({ embeds: [summaryEmbed] });
+
         await message.channel.send({ embeds: [summaryEmbed] });
 
         const lostPersonRole = message.guild.roles.cache.get(

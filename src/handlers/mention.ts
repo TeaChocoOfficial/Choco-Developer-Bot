@@ -6,7 +6,10 @@ import { Message } from "discord.js";
  * @param message - ออบเจ็กต์ข้อความที่ได้รับ
  */
 export const handleMention = (message: Message) => {
-    if (message.author.bot || !message.mentions.has(message.client.user!.id))
+    if (
+        message.author.bot ||
+        !message.mentions.users.has(message.client.user!.id)
+    )
         return;
 
     const greetings = [

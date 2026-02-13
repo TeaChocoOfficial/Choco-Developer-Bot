@@ -11,6 +11,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 export function createButtons(
     questionIndex: number,
     showSummary: boolean = false,
+    existingValue?: any,
 ) {
     const buttons: ButtonBuilder[] = [];
     const question = questions[questionIndex];
@@ -22,6 +23,16 @@ export function createButtons(
                 .setLabel("ย้อนกลับ")
                 .setStyle(ButtonStyle.Secondary)
                 .setEmoji("⬅️"),
+        );
+    }
+
+    if (existingValue) {
+        buttons.push(
+            new ButtonBuilder()
+                .setCustomId("keep")
+                .setLabel("ใช้ข้อมูลเดิม")
+                .setStyle(ButtonStyle.Success)
+                .setEmoji("✅"),
         );
     }
 

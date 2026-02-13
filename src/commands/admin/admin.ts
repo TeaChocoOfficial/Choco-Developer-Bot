@@ -1,4 +1,4 @@
-// -Path: "Choco-Developer-Bot/src/commands/admin.ts"
+//-Path: "Choco-Developer-Bot/src/commands/admin/admin.ts"
 import {
     Message,
     PermissionFlagsBits,
@@ -19,6 +19,9 @@ export async function adminMessageCreate(
     );
     if (!isAdmin) return;
 
+    if (message.content === "admin") {
+        message.reply("Admin");
+    }
     clear(message);
     embed(message);
 }

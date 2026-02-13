@@ -256,6 +256,7 @@ export async function handleEditSpecificFields(
  */
 export async function startCustomMode(
     message: OmitPartialGroupDMChannel<Message<boolean>>,
+    initialData?: IIntroduction,
 ) {
     const template =
         "```\n" +
@@ -271,13 +272,19 @@ export async function startCustomMode(
         "รายละเอียดเพิ่มเติม: (เช่น เป้าหมาย)\n" +
         "```";
 
+    const isEdit = !!initialData;
+
     const customEmbed = new EmbedBuilder()
-        .setColor(0x2ecc71)
-        .setTitle("📝 แนะนำตัวแบบอิสระ")
+        .setColor(isEdit ? 0xe67e22 : 0x2ecc71)
+        .setTitle(isEdit ? "✏️ แก้ไขข้อมูลแบบอิสระ" : "📝 แนะนำตัวแบบอิสระ")
         .setDescription(
-            "คุณสามารถพิมพ์ข้อมูลของคุณมาได้เลยอย่างอิสระ หรือจะใช้เทมเพลตด้านล่างนี้ก็ได้ครับ\n\n" +
+            (isEdit ?
+                "คุณสามารถพิมพ์ข้อมูลใหม่เพื่อแก้ไขได้เลยครับ หรือจะใช้เทมเพลตเดิมด้านล่างก็ได้\n\n"
+            :   "คุณสามารถพิมพ์ข้อมูลของคุณมาได้เลยอย่างอิสระ หรือจะใช้เทมเพลตด้านล่างนี้ก็ได้ครับ\n\n") +
                 "💡 **คำแนะนำ:** พยายามระบุหัวข้อ (เช่น ชื่อ: อายุ:) เพื่อความแม่นยำ\n\n" +
-                template,
+                (isEdit && initialData.rawContent ?
+                    "```\n" + initialData.rawContent + "\n```"
+                :   template),
         );
 
     const buttons = [
@@ -332,8 +339,11 @@ export async function startCustomMode(
 
     collector.on("collect", async (response) => {
         const content = response.content.trim();
-        const data = parseCustomIntroduction(content) as IIntroduction;
+        const parsedData = parseCustomIntroduction(content) as IIntroduction;
 
+        // รวมข้อมูลใหม่เข้ากับข้อมูลเก่า (ถ้ามี)
+        const data =
+            initialData ? { ...initialData, ...parsedData } : parsedData;
         data.rawContent = content;
 
         if (!data.name) {
@@ -353,7 +363,7 @@ export async function startCustomMode(
         await response.delete().catch(() => {});
         await customMessage.delete().catch(() => {});
         await confirmIntroduction(data as IIntroduction, message, () =>
-            startCustomMode(message),
+            startCustomMode(message, initialData),
         );
     });
 }
@@ -392,7 +402,14 @@ export async function startStepByStep(
     });
 
     const askQuestion = async () => {
-        const buttons = createButtons(currentQuestionIndex, !!initialData);
+        const currentQuestion = questions[currentQuestionIndex];
+        const existingValue =
+            initialData ? (initialData as any)[currentQuestion.key] : null;
+        const buttons = createButtons(
+            currentQuestionIndex,
+            !!initialData,
+            existingValue,
+        );
         const filter = (response: Message) =>
             response.author.id === message.author.id;
         const embed = createQuestionEmbed(
@@ -476,6 +493,31 @@ export async function startStepByStep(
                 });
 
                 setTimeout(() => cancelMessage.delete().catch(() => {}), 10000);
+                return;
+            }
+
+            if (interaction.customId === "keep") {
+                messageCollector.stop();
+                buttonCollector.stop();
+
+                await questionMessage.delete().catch(() => {});
+
+                const currentQuestion = questions[currentQuestionIndex];
+                if (currentQuestion && initialData)
+                    collectedData[currentQuestion.key] = (initialData as any)[
+                        currentQuestion.key
+                    ];
+
+                currentQuestionIndex++;
+
+                if (currentQuestionIndex < questions.length) {
+                    await askQuestion();
+                } else {
+                    await startMessage.delete().catch(() => {});
+                    await confirmIntroduction(collectedData, message, () =>
+                        startStepByStep(message),
+                    );
+                }
                 return;
             }
 
