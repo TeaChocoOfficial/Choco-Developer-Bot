@@ -1,8 +1,0 @@
-# -Path: "Choco-Developer-Bot/.dockerignore"
-node_modules
-dist
-.git
-.env
-fly.toml
-Dockerfile
-pnpm-debug.log

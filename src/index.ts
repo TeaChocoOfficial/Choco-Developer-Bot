@@ -25,11 +25,12 @@ const token = process.env.DISCORD_TOKEN;
  * เริ่มการทำงานของบอทพร้อมระบบรันใหม่อัตโนมัติเมื่อเกิดข้อผิดพลาด
  */
 const initialize = async () => {
+    console.log("⚡ Starting bot initialization...");
+
     try {
         await connectDatabase();
-        ready(client);
-        setupMemberJoinHandler(client);
         await client.login(token);
+        console.log("✅ Success: client.login() resolved");
     } catch (error) {
         console.error("❌ Bot Error:", error);
         console.log("🔄 กำลังรีสตาร์ทใน 5 วินาที...");
@@ -53,4 +54,6 @@ app.get("/", (request, response) =>
 );
 app.listen(port, () => console.log(`🚀 Express is listening on port ${port}`));
 
+ready(client);
+setupMemberJoinHandler(client);
 initialize();

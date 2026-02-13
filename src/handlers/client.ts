@@ -1,8 +1,8 @@
 //-Path: "Choco-Developer-Bot/src/handlers/client.ts"
-import { handleMention } from "./mention";
 import { Client, Events } from "discord.js";
-import { adminMessageCreate } from "../commands/admin/admin";
+import { handleMention } from "./mention";
 import { handleIntroduction } from "../commands/introduction";
+import { adminMessageCreate } from "../commands/admin/admin";
 
 /**
  * ฟังก์ชันเริ่มต้นสำหรับจัดการเหตุการณ์ของ Client
