@@ -29,6 +29,7 @@ const initialize = async () => {
 
     try {
         await connectDatabase();
+        console.log("🔃 Clinet login...");
         await client.login(token);
         console.log("✅ Success: client.login() resolved");
     } catch (error) {
