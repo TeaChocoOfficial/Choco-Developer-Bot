@@ -1,0 +1,15 @@
+#-Path: "Choco-Developer-Bot/docker-compose.yml"
+version: '3.8'
+
+services:
+  choco-bot:
+    build: .
+    container_name: choco-developer-bot
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+    env_file:
+      - .env

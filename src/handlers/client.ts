@@ -1,8 +1,10 @@
 //-Path: "Choco-Developer-Bot/src/handlers/client.ts"
-import { Client, Events } from "discord.js";
 import { handleMention } from "./mention";
-import { handleIntroduction } from "../commands/introduction";
+import { Client, Events } from "discord.js";
+import { handleRPS } from "../commands/rps";
+import { handleInfo } from "../commands/info";
 import { adminMessageCreate } from "../commands/admin/admin";
+import { handleIntroduction } from "../commands/introduction";
 
 /**
  * ฟังก์ชันเริ่มต้นสำหรับจัดการเหตุการณ์ของ Client
@@ -18,5 +20,7 @@ export const ready = (client: Client) => {
         handleMention(message);
         adminMessageCreate(message);
         handleIntroduction(message);
+        handleInfo(message);
+        handleRPS(message);
     });
 };

@@ -1,4 +1,0 @@
-approveBuildsOnInstall: true
-
-ignoredBuiltDependencies:
-  - esbuild
